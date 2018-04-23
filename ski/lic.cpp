@@ -1,4 +1,4 @@
-#include<bits/stdc++.h>
+/#include<bits/stdc++.h>
 
 using namespace std;
 
@@ -24,13 +24,12 @@ typedef set<int> SI;
 
 int n;
 
-const int A = 10;
-const int MA = 30;
+const int MA = 60;
 
-int tab[3][A];
-int num[] = {2, 3, 5};
+LL tab[3][MA];
+LL num[] = {2, 3, 5};
 
-SI ajkc;
+set<LL> ajkc;
 
 int main()
 {
@@ -39,32 +38,33 @@ int main()
 	
 	REP(j, 3)
 	{
-		int cnt = 1;
-		REP(i, A)
+		LL cnt = 1;
+		REP(i, MA)
 		{
 			tab[j][i] = cnt;
 			cnt *= num[j];
 		}
 	}
 	
-	REP(i, A)
+	REP(i, MA)
 	{
-		REP(j, A)
+		REP(j, MA)
 		{
-			REP(k, A)
+			REP(k, MA)
 			{
+				if(i+3*j/2+2*k < 55)
 				ajkc.insert(tab[0][i] * tab[1][j] * tab[2][k]);
 			}
 		}
 	}
 	
-	REP(j, 3)
-	{
-		REP(i, A) cout<<tab[j][i]<<" ";
-		cout<<endl;
-	}
-	
-	FOREACH(it, ajkc) if(*it>0) cout<<*it<<" ";
+	//~ REP(j, 3)
+	//~ {
+		//~ REP(i, MA) cout<<tab[j][i]<<" ";
+		//~ cout<<endl;
+	//~ }
+	int cnt = 0;
+	FOREACH(it, ajkc) if(++cnt == n) cout<<*it<<" ";
 	
 	return 0;
 }

@@ -3,12 +3,13 @@
 using namespace std;
 
 typedef long long LL;
+typedef unsigned long long ULL;
 typedef pair<int, int> PII;
 typedef vector<int> VI;
 
-const int INF = 1e9+7;
+const LL INF = 1000000000000000007;
 const int MAXN = 201;
-const int LEN = 20;
+const int LEN = 200;
 const int A = 10;
 
 #define FOR(i, b, e) for(int i = b; i <= e; ++i)
@@ -23,12 +24,11 @@ const int A = 10;
 #define ALL(c) (c).begin(), (c).end()
 #define SIZE(c) (int)(c).size()
 
-#define DEBUG(s) s
+#define DEBUG(s) 
 
 int s, m, q;
 LL k;
 LL dp[MAXN][MAXN][MAXN];
-LL pref[MAXN][MAXN][MAXN];
 
 int mods[MAXN];
 
@@ -41,8 +41,8 @@ void draw(LL x, int len, int sum, int md)
 	FORD(i, sum, max(0, sum - 9))
 	{
 		it = i;
-		if(pref[len-1][i][MOD(md-(sum-i)*mods[len])] >= x) break;
-		x -= pref[len-1][i][MOD(md-(sum-i)*mods[len])];
+		if(dp[len-1][i][MOD(md-(sum-i)*mods[len])] >= x) break;
+		x -= dp[len-1][i][MOD(md-(sum-i)*mods[len])];
 	}
 	cout<<sum-it;
 	draw(x, len-1, it, MOD(md-(sum-it)*mods[len]));
@@ -51,8 +51,9 @@ void draw(LL x, int len, int sum, int md)
 void draw(LL x)
 {
 	int it = 1;
-	while(it <= LEN && pref[it][s][0] < x) ++it;
-	if(pref[it][s][0] < x) cout<<"NIE";
+	while(it < LEN && dp[it][s][0] < x) ++it;
+	DEBUG(cout<<"("<<it<<") ";)
+	if(dp[it][s][0] < x) cout<<"NIE";
 	else draw(x, it, s, 0);
 	cout<<"\n";
 }
@@ -67,27 +68,17 @@ int main()
 	//~ DEBUG(FOR(i, 1, LEN) cout<<mods[i]<<" "; cout<<endl;)
 	
 	FOR(i, 0, 9) dp[1][i][MOD(i)] = 1;
-	FOR(i, 1, LEN-1)
+	FOR(i, 2, LEN)
 	{
 		FOR(j, 0, s)
 		{
 			FOR(r, 0, m-1)
 			{
-				FOR(k, 0, min(9, s-j)) 
+				FOR(k, 0, min(9, j)) 
 				{
-					dp[i+1][j+k][MOD(r+k*mods[i+1])] += dp[i][j][r];
+					dp[i][j][r] += dp[i-1][j-k][MOD(r-k*mods[i])];
+					dp[i][j][r] = min(dp[i][j][r], INF);
 				}
-			}
-		}
-	}
-	
-	FOR(i, 1, LEN)
-	{
-		FOR(j, 0, s)
-		{
-			FOR(r, 0, m-1)
-			{
-				pref[i][j][r] = pref[i-1][j][r] + dp[i][j][r];
 			}
 		}
 	}

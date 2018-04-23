@@ -8,8 +8,8 @@ typedef vector<int> VI;
 
 const int INF = 1000000007;
 const int MAXN = 1000001;
-const int Ml = 1 << 21;
-const int M = 1 << 20;
+const int Ml = 2 << 21;
+const int M = 2 << 20;
 
 #define FOR(i, b, e) for(int i = b; i <= e; ++i)
 #define FORD(i, b, e) for(int i = b; i >= e; --i)

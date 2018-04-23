@@ -25,6 +25,7 @@ typedef set<int> SI;
 
 int pref[A][MAXN];
 int n, m, a, b;
+int h;
 string s;
 
 int main()
@@ -33,9 +34,11 @@ int main()
 	cin>>n>>m;
 	cin>>s;
 	
+	REP(i, n) h = max(h, s[i]-'a');
+	h++;
 	REP(i, n)
 	{
-		REP(j, A) pref[j][i+1] = pref[j][i];
+		REP(j, h) pref[j][i+1] = pref[j][i];
 		pref[s[i]-'a'][i+1]++;
 	}
 	
@@ -48,10 +51,10 @@ int main()
 	REP(i, m)
 	{
 		cin>>a>>b;
-		char c;
+		char c = 0;
 		int mx = 0, wmx = 0, kmx = 0;
 		
-		REP(j, A)
+		REP(j, h)
 		{
 			kmx = pref[j][b] - pref[j][a-1];
 			

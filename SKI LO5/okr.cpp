@@ -1,14 +1,16 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-const int INF = 1000000007;
-const int MAXN = 500001;
-const int LOG = 20;
-
 typedef long long LL;
 typedef pair<int, int> PII;
 typedef vector<int> VI;
 typedef set<int> SI;
+
+const int INF = 1000000007;
+const int MAXN = 500002;
+
+const LL P = 31;
+const LL MOD = 533600747;
 
 #define FOR(i, b, e) for(int i = b; i <= e; ++i)
 #define FORD(i, b, e) for(int i = b; i >= e; --i)
@@ -24,50 +26,49 @@ typedef set<int> SI;
 #define ST first
 #define ND second
 
+#define DEBUG(s) 
+
 int n, q, a, b;
 string s;
 
-int dict[LOG][MAXN];
-int logs[MAXN];
+LL h[MAXN];
+LL mods[MAXN];
 VI divs[MAXN];
 bitset<MAXN> odw;
 
-void build_KMR(string &s)
+inline LL nr(char c)
 {
-	pair<PII, int> pairs[n];
+	return c - 'a' + 1;
+}
+
+void hasz()
+{
+	mods[0] = 1;
+	FOR(i, 1, n) mods[i] = (mods[i-1] * P) % MOD;
 	
-	REP(i, n) dict[0][i] = s[i];
-	for(int l = 1; (1<<l) <= n; l++)
+	h[n-1] = nr(s[n-1]);
+	FORD(i, n-2, 0)
 	{
-		REP(i, n-(1<<l)+1) pairs[i] = MP(MP(dict[l-1][i], dict[l-1][i+(1<<(l-1))]), i);
-		sort(pairs, pairs + n - (1<<l)+1);
-		int nr = 1;
-		REP(i, n-(1<<l)+1)
-		{
-			if(i > 0 && pairs[i].ST != pairs[i-1].ST) nr++;
-			dict[l][pairs[i].ND] = nr;
-		}
+		h[i] = (nr(s[i]) + h[i+1] * P) % MOD;
 	}
+	
+	DEBUG(
+	FOR(i, 0, n) cout<<mods[i]<<" "; cout<<endl;
+	REP(i, n) cout<<h[i]<<" "; cout<<endl;
+	)
 }
 
-void logcalc()
+inline LL gethasz(int a, int len)
 {
-	int lg = 0;
-	FOR(i, 1, n)
-	{
-		if((1<<(lg+1)) < i) lg++;
-		logs[i] = lg;
-	}
+	LL tmp = (h[a+len]*mods[len] - h[a]) % MOD;
+	return (tmp >= 0 ? tmp : tmp+MOD);
 }
 
-bool compare(int a, int b, int len)
+inline bool compare(int a, int b, int len)
 {
 	int ok = b-a+1-len;
-	int lg = logs[len], dl = 1<<lg;
-	//~ cout<<"ok: "<<ok<<" len: "<<len<<" lg: "<<lg<<" dl: "<<dl<<"\n";
-	//~ cout<<"a1: "<<a<<" a2: "<<a+ok<<" b1: "<<(b-ok)-(dl-1)<<" b2: "<<b-(dl-1)<<"\n";
-	//~ cout<<dict[lg][a]<<" "<<dict[lg][a+ok]<<" "<<dict[lg][b-ok-(dl-1)]<<" "<<dict[lg][b-(dl-1)]<<"\n";
-	return (dict[lg][a] == dict[lg][a+ok]) && (dict[lg][b-ok-(dl-1)] == dict[lg][b-(dl-1)]);
+	DEBUG(cout<<gethasz(a, len)<<" "<<gethasz(a+ok, len)<<endl;)
+	return (gethasz(a, len) == gethasz(a+ok, len));
 }
 
 void divscalc(int x)
@@ -80,8 +81,6 @@ void divscalc(int x)
 	}
 	int k = SIZE(divs[x]);
 	FORD(i, k-1, 1) divs[x].PB(x/divs[x][i]);
-	//~ for(int i: divs[x]) cout<<i<<" ";
-	//~ cout<<endl;
 }
 
 
@@ -91,17 +90,7 @@ int main()
 	cin>>n;
 	cin>>s;
 	
-	logcalc();
-	build_KMR(s);
-	
-	//~ FOR(i, 1, n) cout<<logs[i]<<" ";
-	//~ cout<<"\n";
-	
-	//~ for(int i = 0; (1 << i) <= SIZE(s); i++)
-	//~ {
-		//~ REP(j, SIZE(s)/*-(1<<i)+1*/) cout<<dict[i][j]<<" ";
-		//~ cout<<"\n";
-	//~ }
+	hasz();
 	
 	cin>>q;
 	FOR(it, 1, q)
@@ -111,7 +100,6 @@ int main()
 		int k = b-a+1;
 		int res = k;
 		divscalc(k);
-		//~ cout<<"t: "<<it<<endl;
 		for(int i: divs[k])
 		{
 			int okr = i;

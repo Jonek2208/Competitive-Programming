@@ -8,6 +8,7 @@ typedef vector<int> VI;
 
 const int INF = 1e9+7;
 const int MAXN = 1e6+1;
+const int SQ = 5000;
 
 #define FOR(i, b, e) for(int i = b; i <= e; ++i)
 #define FORD(i, b, e) for(int i = b; i >= e; --i)
@@ -24,38 +25,89 @@ const int MAXN = 1e6+1;
 #define DEBUG(s) 
 
 int n, z, a, b;
+int sq;
 
-int tab[MAXN], place[MAXN];
+int pref[MAXN];
+int val[MAXN];
+int res;
+int sum[210];
+unordered_map<int, int> nums[210];
 
 int main()
 {
 	ios::sync_with_stdio(0);
 	cin>>n>>z;
-	FOR(i, 1, n) cin>>tab[i];
+	sq = sqrt(n);
+	sq = SQ;
+	DEBUG(cout<<sq<<endl;)
+	FOR(i, 1, n) cin>>val[i];
 	
-	FOR(i, 1, n) place[tab[i]] = i;
+	FOR(i, 1, n) val[i] -= i;
+	FOR(i, 1, n) pref[i] = pref[i-1] + val[i];
+	FOR(i, 1, n) nums[i/sq][pref[i]]++;
+	
+	DEBUG(
+	FOR(i, 0, n/sq)
+	{
+		for(auto j: nums[i]) cout<<"("<<j.ST<<" "<<j.ND<<") ";
+		cout<<endl;	
+	}
+	)
+	
+	FOR(i, 0, n/sq) res+=nums[i][0];
 	
 	REP(i, z)
 	{
 		if(i > 0)
 		{
 			cin>>a>>b;
-			int a1 = tab[a], b1 = tab[b];
-			swap(place[a1], place[b1]);
-			swap(tab[a], tab[b]);
+			int ka = a/sq, kb = (b-1)/sq;
+			int d = -val[a];
+			int a1 = val[a] + a, b1 = val[b] + b;
+			val[b] = a1 - b;
+			val[a] = b1 - a;
+			d += val[a]; 
+			DEBUG(cout<<d<<endl;)
+			
+			FOR(i, ka+1, kb-1) 
+			{
+				res -= nums[i][-sum[i]];
+				sum[i] += d;
+				res += nums[i][-sum[i]];
+			}
+			
+			FOR(i, a, min((ka+1)*sq-1, b-1))
+			{
+				if(pref[i] + sum[ka] == 0) res--;
+				nums[ka][pref[i]]--;
+				pref[i] += d;
+				nums[ka][pref[i]]++;
+				if(pref[i] + sum[ka] == 0) res++;
+			}
+			if(ka != kb)
+			{
+				FOR(i, kb*sq, b-1)
+				{
+					if(pref[i] + sum[kb] == 0) res--;
+					nums[kb][pref[i]]--; 
+					pref[i] += d;
+					nums[kb][pref[i]]++; 
+					if(pref[i] + sum[kb] == 0) res++;
+				}
+			}
+				DEBUG(
+				FOR(i, 0, n/sq)
+				{
+					cout<<sum[i]<<" ";
+					for(auto j: nums[i]) cout<<"("<<j.ST<<" "<<j.ND<<") ";
+					cout<<endl;	
+				}
+				)
 		}
 		
 		DEBUG(
 		FOR(i, 1, n) cout<<tab[i]<<" "; cout<<endl;
-		FOR(i, 1, n) cout<<place[i]<<" "; cout<<endl;
 		)
-		int mxpl = 0;
-		int res = 0;
-		FOR(i, 1, n)
-		{
-			mxpl = max(mxpl, place[i]);
-			if(mxpl <= i) res++;
-		}
 		
 		cout<<res<<"\n";
 	}	

@@ -1,4 +1,3 @@
-/*Pokrycie cyklowe*/
 #include <bits/stdc++.h>
 using namespace std;
 
